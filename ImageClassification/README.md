@@ -2,7 +2,7 @@
 
 This repository provides the implementation of **DualOptim** applied to **image classification unlearning tasks**, integrating with existing unlearning frameworks such as **SalUn**, **SFRon**, and **SCRUB**. DualOptim introduces a *dual-objective optimization* mechanism to balance **forgetting** and **retention** objectives effectively.
 
-------
+
 
 ## 1. Get the Origin Model
 
@@ -24,7 +24,7 @@ python main_train.py \
 python main_train.py --arch resnet18 --dataset cifar10 --lr 0.1 --epochs 182 --save_dir resnet18_cifar10
 ```
 
-------
+
 
 ## 2. Generate Saliency Map (for SalUn only)
 
@@ -38,7 +38,7 @@ python generate_mask.py \
   --unlearn_epochs 1
 ```
 
-------
+
 
 ## 3. Unlearning with DualOptim
 
@@ -74,7 +74,7 @@ python main_random.py \
   --mask_path mask/with_0.5.pt
 ```
 
-------
+
 
 ### **SFRon**
 
@@ -91,7 +91,7 @@ python -u main_random_sfron.py \
   --optim ${sgd, adam, dual...}
 ```
 
-------
+
 
 ###  **SCRUB**
 
@@ -107,7 +107,7 @@ python -u main_forget.py \
   --optim ${sgd, adam, dual...}
 ```
 
-------
+
 
 ## Baseline Methods
 
@@ -125,7 +125,7 @@ python main_forget.py \
   --unlearn_lr ${learning rate for unlearning}
 ```
 
-------
+
 
 ### Fine-tuning (FT)
 
@@ -139,7 +139,7 @@ python main_forget.py \
   --unlearn_lr ${learning rate for unlearning}
 ```
 
-------
+
 
 ### Random Label (RL)
 
@@ -155,7 +155,7 @@ python main_random.py \
   --save_dir ${save_dir}
 ```
 
-------
+
 
 ### Gradient Ascent (GA)
 
@@ -171,7 +171,7 @@ python main_forget.py \
 
 > 💡 *Hyperparameter settings for each baseline can be found in the corresponding SalUn or SFRon papers.*
 
-------
+
 
 ## Evaluation
 

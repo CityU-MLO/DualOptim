@@ -2,7 +2,7 @@
 
 This repository contains the **LLM-side implementation of DualOptim**, a unified optimization framework for machine unlearning in large language models (LLMs). DualOptim introduces a **dual-objective optimization mechanism** that jointly minimizes the *retention of forgotten knowledge* and maximizes *model utility preservation*, making it applicable to both **fictitious** and **real-world unlearning scenarios**.
 
-------
+
 
 ## 🔧 Environment Configuration
 
@@ -20,7 +20,7 @@ pip install flash-attn --no-build-isolation
 
 > Our details information about package: flash-attn==2.7.4.post1, bitsandbytes==0.45.3 
 
-------
+
 
 ## 🚀 Running Experiments
 
@@ -34,7 +34,7 @@ DualOptim follows the same experiment structure as the **TOFU Benchmark** and **
 bash scripts/tofu/baselines.sh
 ```
 
-------
+
 
 ### 2. DualOptim
 
@@ -66,8 +66,6 @@ bash scripts/continual_tofu/idk_ap.sh
 
 #### 
 
-------
-
 ## 📘 Notes
 
 - DualOptim modifies the optimization loop in `forget.py` and `trainer/dual_optim_trainer.py`
@@ -75,5 +73,4 @@ bash scripts/continual_tofu/idk_ap.sh
 - The framework supports any **decoder-only transformer models** that are compatible with Hugging Face’s `AutoModelForCausalLM`.
 - Configuration and task lists can be customized in the `configs/` and `scripts/` folders.
 
-------
 
