@@ -2,10 +2,6 @@
 
 This repository provides the **official implementation of DualOptim**, a unified optimization framework for **machine unlearning** across multiple modalities, including **Large Language Models (LLMs)**, **Image Classification**, and **Image Generation**.
 
-DualOptim formulates unlearning as a **dual-objective optimization** problem that jointly minimizes residual knowledge retention while preserving model utility, offering a general mechanism for both discriminative and generative models.
-
-
-
 ## Overview
 
 Recent advancements in **machine unlearning (MU)** have made it a vital technique for ensuring data privacy and trustworthiness in modern AI systems. However, existing approximate MU methods — which aim to forget specific data samples without full retraining — suffer from **high sensitivity to hyperparameters** and **unstable performance** across different datasets and forgetting scenarios. These issues limit their scalability and practical deployment.
