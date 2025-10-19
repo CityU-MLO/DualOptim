@@ -3,9 +3,7 @@ import pandas as pd
 import math
 
 
-root_dir = (
-    "/path/to/closer-look-LLM-unlearning/results/tofu_phi1-5_npo_gd/phi1.5"
-)
+root_dir = "/path/to/closer-look-LLM-unlearning/results/tofu_phi1-5_npo_gd/phi1.5"
 # Initialize a list to store the results
 results = []
 

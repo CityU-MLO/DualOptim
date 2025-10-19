@@ -2,7 +2,7 @@ export WANDB_MODE="offline"
 
 MASTER_PORT=$((RANDOM % 50001 + 10000))
 forget_losses=(
-    ME+GD
+    IDK+AP
 )
 
 split_list=(forget10)

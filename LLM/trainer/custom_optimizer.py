@@ -217,7 +217,6 @@ class Optimizer2StateDecouple(bnb.optim.optimizer.Optimizer8bit):
             config.update(self.mng.index2config[(gindex, pindex)])
         return config
 
-
     @torch.no_grad()
     def init_state(self, group, p, gindex, pindex):
         config = self.get_config(gindex, pindex, group)
@@ -319,33 +318,45 @@ class Optimizer2StateDecouple(bnb.optim.optimizer.Optimizer8bit):
                     )
             else:
                 if config["decouple_m"]:
-                    state["max1_1"] = torch.zeros((1,), dtype=torch.float32, device=p.device)
+                    state["max1_1"] = torch.zeros(
+                        (1,), dtype=torch.float32, device=p.device
+                    )
                     state["new_max1_1"] = torch.zeros(
                         (1,), dtype=torch.float32, device=p.device
                     )
 
-                    state["max1_2"] = torch.zeros((1,), dtype=torch.float32, device=p.device)
+                    state["max1_2"] = torch.zeros(
+                        (1,), dtype=torch.float32, device=p.device
+                    )
                     state["new_max1_2"] = torch.zeros(
                         (1,), dtype=torch.float32, device=p.device
                     )
                 else:
-                    state["max1"] = torch.zeros((1,), dtype=torch.float32, device=p.device)
+                    state["max1"] = torch.zeros(
+                        (1,), dtype=torch.float32, device=p.device
+                    )
                     state["new_max1"] = torch.zeros(
                         (1,), dtype=torch.float32, device=p.device
                     )
 
                 if config["decouple_m"]:
-                    state["max2_1"] = torch.zeros((1,), dtype=torch.float32, device=p.device)
+                    state["max2_1"] = torch.zeros(
+                        (1,), dtype=torch.float32, device=p.device
+                    )
                     state["new_max2_1"] = torch.zeros(
                         (1,), dtype=torch.float32, device=p.device
                     )
 
-                    state["max2_2"] = torch.zeros((1,), dtype=torch.float32, device=p.device)
+                    state["max2_2"] = torch.zeros(
+                        (1,), dtype=torch.float32, device=p.device
+                    )
                     state["new_max2_2"] = torch.zeros(
                         (1,), dtype=torch.float32, device=p.device
                     )
                 else:
-                    state["max2"] = torch.zeros((1,), dtype=torch.float32, device=p.device)
+                    state["max2"] = torch.zeros(
+                        (1,), dtype=torch.float32, device=p.device
+                    )
                     state["new_max2"] = torch.zeros(
                         (1,), dtype=torch.float32, device=p.device
                     )
@@ -376,7 +387,8 @@ class Optimizer2StateDecouple(bnb.optim.optimizer.Optimizer8bit):
         config = self.get_config(gindex, pindex, group)
 
         if (
-            state["step"] % (config["switch_freq_1"] + config["switch_freq_2"]) < config["switch_freq_1"]
+            state["step"] % (config["switch_freq_1"] + config["switch_freq_2"])
+            < config["switch_freq_1"]
         ):  # switch between mode 1 (forget) and mode 2 (retain)
             mode = 1
         else:
@@ -427,31 +439,33 @@ class Optimizer2StateDecouple(bnb.optim.optimizer.Optimizer8bit):
                 g=grad,
                 p=p,
                 state1=state["state1"]
-                    if not config["decouple_m"]
-                    else state["state1_1"]
-                    if mode == 1
-                    else state["state1_2"],
+                if not config["decouple_m"]
+                else state["state1_1"]
+                if mode == 1
+                else state["state1_2"],
                 beta1=config["betas"][0],
                 eps=config["eps"],
                 step=step,
                 lr=ratio * config["lr"],
                 state2=state["state2"]
-                    if not config["decouple_v"]
-                    else state["state2_1"]
-                    if mode == 1
-                    else state["state2_2"],
+                if not config["decouple_v"]
+                else state["state2_1"]
+                if mode == 1
+                else state["state2_2"],
                 beta2=config["betas"][1],
-                beta3=config["betas"][2] if len(config["betas"]) >= 3 else 0.0,  # no beta3 argument in 0.42.0
+                beta3=config["betas"][2]
+                if len(config["betas"]) >= 3
+                else 0.0,  # no beta3 argument in 0.42.0
                 alpha=config["alpha"],  # no alpha argument in 0.42.0
                 weight_decay=config["weight_decay"],
                 gnorm_scale=gnorm_scale,
                 unorm_vec=state["unorm_vec"]
-                    if config["max_unorm"] > 0.0 and not is_dual
-                    else state["unorm_vec1"]
-                    if config["max_unorm"] > 0.0 and mode == 1
-                    else state["unorm_vec2"]
-                    if config["max_unorm"] > 0.0 and mode == 2
-                    else None,
+                if config["max_unorm"] > 0.0 and not is_dual
+                else state["unorm_vec1"]
+                if config["max_unorm"] > 0.0 and mode == 1
+                else state["unorm_vec2"]
+                if config["max_unorm"] > 0.0 and mode == 2
+                else None,
                 max_unorm=config["max_unorm"],
                 skip_zeros=config["skip_zeros"],
             )
@@ -462,59 +476,59 @@ class Optimizer2StateDecouple(bnb.optim.optimizer.Optimizer8bit):
                 g=grad,
                 p=p,
                 state1=state["state1"]
-                    if not config["decouple_m"]
-                    else state["state1_1"]
-                    if mode == 1
-                    else state["state1_2"],
+                if not config["decouple_m"]
+                else state["state1_1"]
+                if mode == 1
+                else state["state1_2"],
                 state2=state["state2"]
-                    if not config["decouple_v"]
-                    else state["state2_1"]
-                    if mode == 1
-                    else state["state2_2"],
+                if not config["decouple_v"]
+                else state["state2_1"]
+                if mode == 1
+                else state["state2_2"],
                 beta1=config["betas"][0],
                 beta2=config["betas"][1],
                 eps=config["eps"],
                 step=step,
                 lr=ratio * config["lr"],
                 qmap1=state["qmap1"]
-                    if not config["decouple_m"]
-                    else state["qmap1_1"]
-                    if mode == 1
-                    else state["qmap1_2"],
+                if not config["decouple_m"]
+                else state["qmap1_1"]
+                if mode == 1
+                else state["qmap1_2"],
                 qmap2=state["qmap2"]
-                    if not config["decouple_v"]
-                    else state["qmap2_1"]
-                    if mode == 1
-                    else state["qmap2_2"],
+                if not config["decouple_v"]
+                else state["qmap2_1"]
+                if mode == 1
+                else state["qmap2_2"],
                 max1=state["max1"]
-                    if not config["decouple_m"]
-                    else state["max1_1"]
-                    if mode == 1
-                    else state["max1_2"],
+                if not config["decouple_m"]
+                else state["max1_1"]
+                if mode == 1
+                else state["max1_2"],
                 max2=state["max2"]
-                    if not config["decouple_v"]
-                    else state["max2_1"]
-                    if mode == 1
-                    else state["max2_2"],
+                if not config["decouple_v"]
+                else state["max2_1"]
+                if mode == 1
+                else state["max2_2"],
                 new_max1=state["new_max1"]
-                    if not config["decouple_m"]
-                    else state["new_max1_1"]
-                    if mode == 1
-                    else state["new_max1_2"],
+                if not config["decouple_m"]
+                else state["new_max1_1"]
+                if mode == 1
+                else state["new_max1_2"],
                 new_max2=state["new_max2"]
-                    if not config["decouple_v"]
-                    else state["new_max2_1"]
-                    if mode == 1
-                    else state["new_max2_2"],
+                if not config["decouple_v"]
+                else state["new_max2_1"]
+                if mode == 1
+                else state["new_max2_2"],
                 weight_decay=config["weight_decay"],
                 gnorm_scale=gnorm_scale,
                 unorm_vec=state["unorm_vec"]
-                    if config["max_unorm"] > 0.0 and not is_dual
-                    else state["unorm_vec1"]
-                    if config["max_unorm"] > 0.0 and mode == 1
-                    else state["unorm_vec2"]
-                    if config["max_unorm"] > 0.0 and mode == 2
-                    else None,
+                if config["max_unorm"] > 0.0 and not is_dual
+                else state["unorm_vec1"]
+                if config["max_unorm"] > 0.0 and mode == 1
+                else state["unorm_vec2"]
+                if config["max_unorm"] > 0.0 and mode == 2
+                else None,
                 max_unorm=config["max_unorm"],
             )
 
@@ -551,42 +565,44 @@ class Optimizer2StateDecouple(bnb.optim.optimizer.Optimizer8bit):
                 g=grad,
                 p=p,
                 state1=state["state1"]
-                    if not config["decouple_m"]
-                    else state["state1_1"]
-                    if mode == 1
-                    else state["state1_2"],
+                if not config["decouple_m"]
+                else state["state1_1"]
+                if mode == 1
+                else state["state1_2"],
                 state2=state["state2"]
-                    if not config["decouple_v"]
-                    else state["state2_1"]
-                    if mode == 1
-                    else state["state2_2"],
+                if not config["decouple_v"]
+                else state["state2_1"]
+                if mode == 1
+                else state["state2_2"],
                 beta1=config["betas"][0],
                 beta2=config["betas"][1],
-                beta3=config["betas"][2] if len(config["betas"]) >= 3 else 0.0,  # no beta3 argument in 0.42.0
+                beta3=config["betas"][2]
+                if len(config["betas"]) >= 3
+                else 0.0,  # no beta3 argument in 0.42.0
                 alpha=config["alpha"],  # no alpha argument in 0.42.0
                 eps=config["eps"],
                 step=step,
                 lr=ratio * config["lr"],
                 qmap1=state["qmap1"]
-                    if not config["decouple_m"]
-                    else state["qmap1_1"]
-                    if mode == 1
-                    else state["qmap1_2"],
+                if not config["decouple_m"]
+                else state["qmap1_1"]
+                if mode == 1
+                else state["qmap1_2"],
                 qmap2=state["qmap2"]
-                    if not config["decouple_v"]
-                    else state["qmap2_1"]
-                    if mode == 1
-                    else state["qmap2_2"],
+                if not config["decouple_v"]
+                else state["qmap2_1"]
+                if mode == 1
+                else state["qmap2_2"],
                 absmax1=state["absmax1"]
-                    if not config["decouple_m"]
-                    else state["absmax1_1"]
-                    if mode == 1
-                    else state["absmax1_2"],
+                if not config["decouple_m"]
+                else state["absmax1_1"]
+                if mode == 1
+                else state["absmax1_2"],
                 absmax2=state["absmax2"]
-                    if not config["decouple_v"]
-                    else state["absmax2_1"]
-                    if mode == 1
-                    else state["absmax2_2"],
+                if not config["decouple_v"]
+                else state["absmax2_1"]
+                if mode == 1
+                else state["absmax2_2"],
                 weight_decay=config["weight_decay"],
                 gnorm_scale=gnorm_scale,
                 skip_zeros=config["skip_zeros"],
@@ -632,7 +648,7 @@ class AdamWDecoupleNormal(Optimizer2StateDecouple):
         lr_ratio_2=1.0,
         switch_freq_1=1,
         switch_freq_2=1,
-        reinit_step=None
+        reinit_step=None,
     ):
         """
         8-bit AdamWDecouple optimizer.
@@ -682,7 +698,7 @@ class AdamWDecoupleNormal(Optimizer2StateDecouple):
             lr_ratio_2=lr_ratio_2,
             switch_freq_1=switch_freq_1,
             switch_freq_2=switch_freq_2,
-            reinit_step=reinit_step
+            reinit_step=reinit_step,
         )
 
 
@@ -755,5 +771,5 @@ class AdamWDecouple8bit(Optimizer2StateDecouple):
             lr_ratio_2=lr_ratio_2,
             switch_freq_1=switch_freq_1,
             switch_freq_2=switch_freq_2,
-            reinit_step=reinit_step
+            reinit_step=reinit_step,
         )

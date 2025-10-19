@@ -25,10 +25,25 @@ _smdistributed_available = importlib.util.find_spec("smdistributed") is not None
 
 class CustomTrainerForgettingAlternate(Trainer):
     def __init__(
-        self, alternate=True, optim_cfg="dual_adam", forget_lr=1e-5, retain_lr=1e-5, forget_freq=1, retain_freq=1,
-        svd_rank=64, proj_update_freq=1, gp_forget=True, gp_retain=True, untar_to_tar_milestone=None,
-        alpha=1., beta1=0.9, beta2=0.95, base_beta1=0.95, base_beta2=0.999,
-        *args, **kwargs
+        self,
+        alternate=True,
+        optim_cfg="dual_adam",
+        forget_lr=1e-5,
+        retain_lr=1e-5,
+        forget_freq=1,
+        retain_freq=1,
+        svd_rank=64,
+        proj_update_freq=1,
+        gp_forget=True,
+        gp_retain=True,
+        untar_to_tar_milestone=None,
+        alpha=1.0,
+        beta1=0.9,
+        beta2=0.95,
+        base_beta1=0.95,
+        base_beta2=0.999,
+        *args,
+        **kwargs,
     ):
         self.loss_type = kwargs.pop("loss_type")
         self.ref_model = kwargs.pop("ref_model")
@@ -68,27 +83,31 @@ class CustomTrainerForgettingAlternate(Trainer):
         if self.args.deepspeed is not None:
             self.ref_model = self.e_prepare_deepspeed(self.ref_model)
         if "full_shard" in self.args.fsdp:
-            self.ref_model = FSDP(self.ref_model,
-                                  sharding_strategy=FSDP.ShardingStrategy.FULL_SHARD,
-                                  **self.args.fsdp_config)
+            self.ref_model = FSDP(
+                self.ref_model,
+                sharding_strategy=FSDP.ShardingStrategy.FULL_SHARD,
+                **self.args.fsdp_config,
+            )
 
     def _get_train_sampler(self) -> torch.utils.data.Sampler:
         """
         Override the default sampler to use AlternatingSampler
         """
         if not isinstance(self.train_dataset, ConcatDataset):
-            raise ValueError("This CustomTrainer requires a ConcatDataset for train_dataset.")
+            raise ValueError(
+                "This CustomTrainer requires a ConcatDataset for train_dataset."
+            )
 
         # train_dataset is a combination of dataset_a and dataset_b
         dataset_a, dataset_b = self.train_dataset.datasets
 
         return AlternatingSampler(
-                dataset_a=dataset_a,
-                dataset_b=dataset_b,
-                batch_size=self.args.train_batch_size,
-                m=self.forget_freq * self.args.gradient_accumulation_steps,
-                n=self.retain_freq * self.args.gradient_accumulation_steps,
-            )
+            dataset_a=dataset_a,
+            dataset_b=dataset_b,
+            batch_size=self.args.train_batch_size,
+            m=self.forget_freq * self.args.gradient_accumulation_steps,
+            n=self.retain_freq * self.args.gradient_accumulation_steps,
+        )
 
     def create_optimizer_and_scheduler(self, num_training_steps: int):
         """
@@ -103,15 +122,19 @@ class CustomTrainerForgettingAlternate(Trainer):
         optimizer_grouped_parameters = [
             {
                 "params": [
-                    p for n, p in opt_model.named_parameters() if (n in decay_parameters and p.requires_grad)
+                    p
+                    for n, p in opt_model.named_parameters()
+                    if (n in decay_parameters and p.requires_grad)
                 ],
                 "weight_decay": self.args.weight_decay,
             },
             {
                 "params": [
-                    p for n, p in opt_model.named_parameters() if (n not in decay_parameters and p.requires_grad)
+                    p
+                    for n, p in opt_model.named_parameters()
+                    if (n not in decay_parameters and p.requires_grad)
                 ],
-                "weight_decay": 0.,
+                "weight_decay": 0.0,
             },
         ]
 
@@ -125,7 +148,7 @@ class CustomTrainerForgettingAlternate(Trainer):
                 lr_ratio_1=self.forget_lr_ratio,
                 switch_freq_1=self.forget_freq,
                 switch_freq_2=self.retain_freq,
-                reinit_step=self.untar_to_tar_milestone
+                reinit_step=self.untar_to_tar_milestone,
             )
         elif self.optim_cfg == "dual_adam_8bit":
             print("8bit DualAdam > Using forget ratio: ", self.forget_lr_ratio)
@@ -137,7 +160,7 @@ class CustomTrainerForgettingAlternate(Trainer):
                 lr_ratio_1=self.forget_lr_ratio,
                 switch_freq_1=self.forget_freq,
                 switch_freq_2=self.retain_freq,
-                reinit_step=self.untar_to_tar_milestone
+                reinit_step=self.untar_to_tar_milestone,
             )
             import bitsandbytes
 
@@ -146,9 +169,13 @@ class CustomTrainerForgettingAlternate(Trainer):
             skipped = 0
             for module in opt_model.modules():
                 if isinstance(module, nn.Embedding):
-                    skipped += sum({p.data_ptr(): p.numel() for p in module.parameters()}.values())
+                    skipped += sum(
+                        {p.data_ptr(): p.numel() for p in module.parameters()}.values()
+                    )
                     # logger.info(f"skipped {module}: {skipped / 2 ** 20}M params")
-                    manager.register_module_override(module, "weight", {"optim_bits": 32})
+                    manager.register_module_override(
+                        module, "weight", {"optim_bits": 32}
+                    )
                     # logger.debug(f"bitsandbytes: will optimize {module} in fp32")
             print(f"skipped: {skipped / 2 ** 20}M params")
         else:
@@ -159,7 +186,9 @@ class CustomTrainerForgettingAlternate(Trainer):
             num_training_steps=num_training_steps, optimizer=optimizer
         )
 
-    def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
+    def compute_loss(
+        self, model, inputs, return_outputs=False, num_items_in_batch=None
+    ):
         if self.alternate:  # alternating update
             if inputs[0] is not None or inputs[2] is not None:
                 type = "forget"
@@ -249,5 +278,3 @@ class CustomTrainerForgettingAlternate(Trainer):
             param.requires_grad = False
 
         return model
-
-

@@ -11,7 +11,12 @@ from sklearn.metrics.pairwise import cosine_similarity
 from tqdm import tqdm
 from transformers import pipeline
 
-from dataset import TextDatasetQA, TextIdkDatasetQA, custom_data_collator, get_batch_loss
+from dataset import (
+    TextDatasetQA,
+    TextIdkDatasetQA,
+    custom_data_collator,
+    get_batch_loss,
+)
 
 
 def read_jsonline(file_path):
@@ -191,7 +196,9 @@ def get_dataloader(
         collate_fn=custom_data_collator,
     )
     idk_dataloader = torch.utils.data.DataLoader(
-        idk_torch_format_dataset, batch_size=cfg.batch_size, collate_fn=custom_data_collator
+        idk_torch_format_dataset,
+        batch_size=cfg.batch_size,
+        collate_fn=custom_data_collator,
     )
 
     return eval_dataloader, base_eval_dataloader, perturb_dataloader, idk_dataloader
@@ -217,7 +224,9 @@ def get_all_evals(
     idk_ground_truths = []
     input_strings = []
 
-    for batch, idk_batch in tqdm(zip(eval_dataloader, idk_dataloader), total=len(eval_dataloader)):
+    for batch, idk_batch in tqdm(
+        zip(eval_dataloader, idk_dataloader), total=len(eval_dataloader)
+    ):
         input_ids, labels, attention_mask = batch
         idk_input_ids, idk_labels, idk_attention_mask = idk_batch
         batch = {
@@ -255,7 +264,7 @@ def get_all_evals(
         )
         eval_logs["gt_loss"] = eval_logs.get("gt_loss", []) + gt_loss.tolist()
         eval_logs["num_token_gt"] = (
-                eval_logs.get("num_token_gt", []) + num_token_gt.tolist()
+            eval_logs.get("num_token_gt", []) + num_token_gt.tolist()
         )
 
         if "forget" in eval_task:
@@ -268,7 +277,7 @@ def get_all_evals(
             )
             eval_logs["idk_loss"] = eval_logs.get("idk_loss", []) + idk_loss.tolist()
             eval_logs["num_token_idk"] = (
-                    eval_logs.get("num_token_idk", []) + num_roken_idk_gt.tolist()
+                eval_logs.get("num_token_idk", []) + num_roken_idk_gt.tolist()
             )
 
     rouge_cores = eval_rouge_recall(gen_outputs, ground_truths)
@@ -280,7 +289,7 @@ def get_all_evals(
     if "forget" in eval_task:
         # eval IDK rouge
         idk_rouge_cores = eval_rouge_recall(gen_outputs, idk_ground_truths)
-        idk_rouge_cores = {"idk_"+k: v for k, v in idk_rouge_cores.items()}
+        idk_rouge_cores = {"idk_" + k: v for k, v in idk_rouge_cores.items()}
         eval_logs.update(idk_rouge_cores)
 
     es_pipe = pipeline(
@@ -363,7 +372,7 @@ def get_all_evals(
                 tofu=tofu,
             )
             # idk_cs = {"idk_"+k: v for k, v in idk_cs.items()}
-            idk_es = {"idk_"+k: v for k, v in idk_es.items()}
+            idk_es = {"idk_" + k: v for k, v in idk_es.items()}
             # eval_logs.update(idk_cs)
             eval_logs.update(idk_es)
 
@@ -403,7 +412,10 @@ def get_eval_results(eval_result_dict):
         if eval_task in eval_result_dict.keys():
             for metric in metrics:
                 output_result[eval_task_dict[eval_task] + " " + metric] = []
-                if eval_task_dict[eval_task] == "Forget" and metric in ["Token Entropy", "Entailment Score"]:
+                if eval_task_dict[eval_task] == "Forget" and metric in [
+                    "Token Entropy",
+                    "Entailment Score",
+                ]:
                     output_result[eval_task_dict[eval_task] + " IDK " + metric] = []
 
     # k is different files
@@ -465,9 +477,9 @@ def get_eval_results(eval_result_dict):
             # output_result[f"{eval_task_dict[k]} IDK Cosine Similarity"] = np.array(
             #     eval_result_dict[k]["idk_cosine_similarity"]
             # ).mean()
-            output_result[f"{eval_task_dict[k]} IDK Entailment Score"] = get_entailment_score(
-                eval_result_dict[k]["idk_entailment_labels"]
-            )
+            output_result[
+                f"{eval_task_dict[k]} IDK Entailment Score"
+            ] = get_entailment_score(eval_result_dict[k]["idk_entailment_labels"])
 
     # print(output_result)
     model_utility_retain_cands = []
@@ -516,7 +528,9 @@ def run_generation(cfg, batch, idk_batch, model, tokenizer):
         ]  # Modify
 
         # record the ground truth for idk
-        idk_input_strings = tokenizer.batch_decode(idk_input_ids, skip_special_tokens=False)
+        idk_input_strings = tokenizer.batch_decode(
+            idk_input_ids, skip_special_tokens=False
+        )
         idk_ground_truth = [
             s.split(split_symbol)[1].split("<|eot_id|>")[0] for s in idk_input_strings
         ]
@@ -537,7 +551,9 @@ def run_generation(cfg, batch, idk_batch, model, tokenizer):
         input_strings = [s.split(split_symbol)[0] + split_symbol for s in input_strings]
 
         # record the ground truth for idk
-        idk_input_strings = tokenizer.batch_decode(idk_input_ids, skip_special_tokens=False)
+        idk_input_strings = tokenizer.batch_decode(
+            idk_input_ids, skip_special_tokens=False
+        )
         idk_ground_truth = []
         for s in idk_input_strings:
             # Split the string into user and assistant parts
@@ -561,7 +577,9 @@ def run_generation(cfg, batch, idk_batch, model, tokenizer):
         input_strings = [s + split_symbol for s in input_strings]
 
         # record the ground truth for idk
-        idk_input_strings = tokenizer.batch_decode(idk_input_ids, skip_special_tokens=True)
+        idk_input_strings = tokenizer.batch_decode(
+            idk_input_ids, skip_special_tokens=True
+        )
         idk_ground_truth = [s.split(split_symbol)[1] for s in idk_input_strings]
 
     # now tokenize the strings with left padding

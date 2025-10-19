@@ -6,6 +6,7 @@ from transformers import Trainer
 from .losses import get_loss
 from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
 
+
 class CustomTrainerForgetting(Trainer):
     def __init__(self, *args, **kwargs):
         self.loss_type = kwargs.pop("loss_type")
@@ -23,11 +24,15 @@ class CustomTrainerForgetting(Trainer):
         if self.args.deepspeed is not None:
             self.ref_model = self.e_prepare_deepspeed(self.ref_model)
         if "full_shard" in self.args.fsdp:
-            self.ref_model = FSDP(self.ref_model,
-                                  sharding_strategy=FSDP.ShardingStrategy.FULL_SHARD,
-                                  **self.args.fsdp_config)
+            self.ref_model = FSDP(
+                self.ref_model,
+                sharding_strategy=FSDP.ShardingStrategy.FULL_SHARD,
+                **self.args.fsdp_config
+            )
 
-    def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
+    def compute_loss(
+        self, model, inputs, return_outputs=False, num_items_in_batch=None
+    ):
 
         forget_loss, regularization_loss = get_loss(
             model, self.ref_model, inputs, self.loss_type, self.beta

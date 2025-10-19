@@ -5,6 +5,7 @@ import numpy as np
 import torch
 import yaml
 
+
 def get_model_identifiers_from_yaml(model_family):
     # path is model_configs.yaml
     """

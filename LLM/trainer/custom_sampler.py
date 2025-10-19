@@ -56,7 +56,8 @@ class AlternatingSampler(Sampler):
                     break
                 yield from batch_indices
 
-            if finished: break
+            if finished:
+                break
 
             # 从 loader_b 中读取 n 个 batch 的索引
             for _ in range(self.n):
@@ -82,8 +83,18 @@ class AlternatingSampler(Sampler):
 
 
 class DistributedAlternatingSampler(Sampler):
-    def __init__(self, dataset_a, dataset_b, batch_size, m, n,
-                 num_replicas=None, rank=None, shuffle=True, seed=0):
+    def __init__(
+        self,
+        dataset_a,
+        dataset_b,
+        batch_size,
+        m,
+        n,
+        num_replicas=None,
+        rank=None,
+        shuffle=True,
+        seed=0,
+    ):
         """
         兼容分布式训练的交替采样器。
 
@@ -123,10 +134,18 @@ class DistributedAlternatingSampler(Sampler):
 
         # 为每个子数据集创建独立的分布式采样器
         self.sampler_a = DistributedSampler(
-            dataset_a, num_replicas=self.num_replicas, rank=self.rank, shuffle=self.shuffle, seed=self.seed
+            dataset_a,
+            num_replicas=self.num_replicas,
+            rank=self.rank,
+            shuffle=self.shuffle,
+            seed=self.seed,
         )
         self.sampler_b = DistributedSampler(
-            dataset_b, num_replicas=self.num_replicas, rank=self.rank, shuffle=self.shuffle, seed=self.seed
+            dataset_b,
+            num_replicas=self.num_replicas,
+            rank=self.rank,
+            shuffle=self.shuffle,
+            seed=self.seed,
         )
 
         # 计算当前 rank 分到的样本总数
@@ -159,7 +178,8 @@ class DistributedAlternatingSampler(Sampler):
                     break
                 yield from batch_indices
 
-            if finished: break
+            if finished:
+                break
 
             # 从 sampler_b 中读取 n 个 batch 的索引
             for _ in range(self.n):

@@ -188,13 +188,7 @@ class TextForgetDatasetQA(Dataset):
 
 class TextForgetDatasetQASingle(Dataset):
     def __init__(
-        self,
-        tokenizer,
-        model_family,
-        data,
-        set_name,
-        max_length=512,
-        mask=False,
+        self, tokenizer, model_family, data, set_name, max_length=512, mask=False
     ):
         super(TextForgetDatasetQASingle, self).__init__()
         self.tokenizer = tokenizer
@@ -270,7 +264,7 @@ class TextDatasetQA(Dataset):
         max_length=512,
         split=None,
         question_key="question",
-        answer_key="answer"
+        answer_key="answer",
     ):
         super(TextDatasetQA, self).__init__()
         self.tokenizer = tokenizer
@@ -283,7 +277,6 @@ class TextDatasetQA(Dataset):
         self.model_configs = get_model_identifiers_from_yaml(model_family)
         self.qk = question_key
         self.ak = answer_key
-
 
     def __len__(self):
         return len(self.data)
@@ -323,7 +316,7 @@ class TextIdkDatasetQA(Dataset):
         max_length=512,
         split=None,
         question_key="question",
-        answer_key="answer"
+        answer_key="answer",
     ):
         super(TextIdkDatasetQA, self).__init__()
         self.tokenizer = tokenizer

@@ -13,8 +13,13 @@ from torch.utils.data import ConcatDataset
 from peft import LoraConfig, get_peft_model, AutoPeftModelForCausalLM, PeftModel
 from transformers import AutoTokenizer, AutoModelForCausalLM, AutoConfig
 
-from dataset import TextForgetDatasetQA, TextForgetDatasetQASingle, dataset_to_json, custom_data_collator_forget, \
-    custom_data_collator_forget_single
+from dataset import (
+    TextForgetDatasetQA,
+    TextForgetDatasetQASingle,
+    dataset_to_json,
+    custom_data_collator_forget,
+    custom_data_collator_forget_single,
+)
 from trainer import CustomTrainerForgetting, CustomTrainerForgettingAlternate
 from utils import get_model_identifiers_from_yaml, set_random_seed
 
@@ -162,18 +167,31 @@ def main(cfg):
     gradient_accumulation_steps = cfg.gradient_accumulation_steps
 
     if cfg.alternate:
-        if np.ceil(len(forget_set) / cfg.forget_freq) <= np.ceil(len(retain_set) / cfg.retain_freq):
-            steps_per_epoch = int((1 + cfg.retain_freq/cfg.forget_freq) * np.ceil(
-                len(forget_set) / (batch_size * gradient_accumulation_steps * num_devices)
-            ))
+        if np.ceil(len(forget_set) / cfg.forget_freq) <= np.ceil(
+            len(retain_set) / cfg.retain_freq
+        ):
+            steps_per_epoch = int(
+                (1 + cfg.retain_freq / cfg.forget_freq)
+                * np.ceil(
+                    len(forget_set)
+                    / (batch_size * gradient_accumulation_steps * num_devices)
+                )
+            )
         else:
-            steps_per_epoch = int((1 + cfg.forget_freq/cfg.retain_freq) * np.ceil(
-                len(retain_set) / (batch_size * gradient_accumulation_steps * num_devices)
-            ))
+            steps_per_epoch = int(
+                (1 + cfg.forget_freq / cfg.retain_freq)
+                * np.ceil(
+                    len(retain_set)
+                    / (batch_size * gradient_accumulation_steps * num_devices)
+                )
+            )
     else:
-        steps_per_epoch = int(np.ceil(
-            len(torch_format_dataset) / (batch_size * gradient_accumulation_steps * num_devices)
-        ))
+        steps_per_epoch = int(
+            np.ceil(
+                len(torch_format_dataset)
+                / (batch_size * gradient_accumulation_steps * num_devices)
+            )
+        )
     max_steps = cfg.num_epochs * steps_per_epoch
     warmup_steps = steps_per_epoch if steps_per_epoch > 1 else 0
 
@@ -215,7 +233,7 @@ def main(cfg):
         fsdp_config={
             # "min_num_params": 1e12,
             # "activation_checkpointing": True,
-            "backward_prefetch": "backward_pre",
+            "backward_prefetch": "backward_pre"
         },
         save_steps=save_steps,
         save_only_model=True,
@@ -262,7 +280,9 @@ def main(cfg):
         model.generation_config.do_sample = True
         if model_cfg["gradient_checkpointing"] == "true":
             # model.gradient_checkpointing_enable()
-            model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
+            model.gradient_checkpointing_enable(
+                gradient_checkpointing_kwargs={"use_reentrant": False}
+            )
 
         # Configure LoRA parameters
         if cfg.use_LoRA:
@@ -305,7 +325,7 @@ def main(cfg):
             forget_coeff=cfg.forget_coeff,
             regularization_coeff=cfg.regularization_coeff,
             forget_freq=cfg.forget_freq,
-            retain_freq=cfg.retain_freq
+            retain_freq=cfg.retain_freq,
         )
 
     else:
