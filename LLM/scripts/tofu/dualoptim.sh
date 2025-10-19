@@ -2,7 +2,8 @@ export WANDB_MODE="offline"
 
 MASTER_PORT=$((RANDOM % 50001 + 10000))
 forget_losses=(
-    IDK+AP
+ME+GD
+IDK+AP
 )
 
 split_list=(forget10)
@@ -10,8 +11,7 @@ split_list=(forget10)
 # the standard TOFU benchmark is task 1
 task_list=(1)
 # pass to python script, for continual learning setting
- export TASK_LIST=$(IFS=,; echo "${task_list[*]}")
-
+export TASK_LIST=$(IFS=,; echo "${task_list[*]}")
 
 learning_rates=(1e-5)
 

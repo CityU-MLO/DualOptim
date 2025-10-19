@@ -28,26 +28,19 @@ DualOptim follows the same experiment structure as the **TOFU Benchmark** and **
 
 ### 1. Baseline (**Closer Look LLM Unlearning**)
 
-#### (1) ME+GD
+This script runs the baseline method from the TOFU benchmark. It performs unlearning on different forget splits (forget01, forget05, forget10) and evaluates the model after each stage. Run the following command to start the baseline unlearning experiment:
 
 ```bash
-bash scripts/tofu/baselines.sh
+bash ./scripts/tofu/baseline.sh
 ```
-
 
 
 ### 2. DualOptim
 
-#### (1) ME+GD
+This script runs our proposed DualOptim framework, which introduces a dual-optimizer mechanism for balanced forgetting and retaining. It supports alternating updates with customizable loss types (e.g., ME+GD, IDK+AP) and flexible optimizer configurations (e.g., dual_adam). Run the following command to start the DualOptim unlearning experiment:
 
 ```bash
-bash scripts/continual_tofu/me_gd.sh
-```
-
-#### (2) IDK+AP
-
-```bash
-bash scripts/continual_tofu/idk_ap.sh
+bash ./scripts/tofu/dualoptim.sh
 ```
 
 ### 3. Hyperparameters
