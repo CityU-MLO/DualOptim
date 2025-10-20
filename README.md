@@ -1,4 +1,4 @@
-# DualOptim: Dual-Objective Optimization for Machine Unlearning
+# DualOptim: Enhancing Efficacy and Stability in Machine Unlearning with Dual Optimizers
 
 This repository provides the **official implementation of DualOptim**, a unified optimization framework for **machine unlearning** across multiple modalities, including **Large Language Models (LLMs)**, **Image Classification**, and **Image Generation**.
 
