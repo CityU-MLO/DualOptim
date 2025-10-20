@@ -32,11 +32,6 @@ class CustomTrainerForgettingAlternate(Trainer):
         retain_lr=1e-5,
         forget_freq=1,
         retain_freq=1,
-        svd_rank=64,
-        proj_update_freq=1,
-        gp_forget=True,
-        gp_retain=True,
-        untar_to_tar_milestone=None,
         alpha=1.0,
         beta1=0.9,
         beta2=0.95,
@@ -62,14 +57,6 @@ class CustomTrainerForgettingAlternate(Trainer):
         self.forget_freq = forget_freq
         self.retain_freq = retain_freq
         self.step_count = 0
-
-        # GP settings
-        self.gp_forget = gp_forget
-        self.gp_retain = gp_retain
-        self.svd_rank = svd_rank
-        self.proj_update_freq = proj_update_freq
-
-        self.untar_to_tar_milestone = untar_to_tar_milestone
 
         self.alpha = alpha
         self.beta1 = beta1

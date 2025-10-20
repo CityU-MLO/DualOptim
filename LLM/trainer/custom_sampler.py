@@ -5,15 +5,7 @@ import numpy as np
 
 class AlternatingSampler(Sampler):
     def __init__(self, dataset_a, dataset_b, batch_size, m, n, generator=None):
-        """
-        Args:
-            dataset_a (Dataset): 第一个数据集.
-            dataset_b (Dataset): 第二个数据集.
-            batch_size (int): 每个批次的大小.
-            m (int): 从 dataset_a 中连续采样的批次数.
-            n (int): 从 dataset_b 中连续采样的批次数.
-            generator (Generator): 用于可复现的随机数生成器.
-        """
+
         super().__init__()
         self.len_a = len(dataset_a)
         self.len_b = len(dataset_b)
@@ -22,7 +14,6 @@ class AlternatingSampler(Sampler):
         self.m = m
         self.n = n
 
-        # 为每个数据集创建独立的随机采样器
         self.sampler_a = RandomSampler(dataset_a, generator=generator)
         self.sampler_b = RandomSampler(dataset_b, generator=generator)
 
@@ -50,7 +41,6 @@ class AlternatingSampler(Sampler):
                         idx = next(iter_a)
                         batch_indices.append(idx)
 
-                # 如果 batch_indices 为空，说明可能迭代已结束
                 if not batch_indices:
                     finished = True
                     break
@@ -59,16 +49,13 @@ class AlternatingSampler(Sampler):
             if finished:
                 break
 
-            # 从 loader_b 中读取 n 个 batch 的索引
             for _ in range(self.n):
                 batch_indices = []
                 for _ in range(self.batch_size):
                     try:
-                        # 关键：为 b 的索引加上 a 的长度偏移
                         idx = next(iter_b) + self.len_a
                         batch_indices.append(idx)
                     except StopIteration:
-                        # 如果 sampler_b 耗尽，重新初始化
                         iter_b = iter(self.sampler_b)
                         idx = next(iter_b) + self.len_a
                         batch_indices.append(idx)
@@ -168,25 +155,20 @@ class DistributedAlternatingSampler(Sampler):
                         idx = next(iter_a)
                         batch_indices.append(idx)
                     except StopIteration:
-                        # 分布式采样器耗尽时，不应该手动重启，因为一个 epoch 的数据已经采样完毕
-                        # 我们可以选择提前结束或者用完另一个采样器的数据
-                        # 这里我们简单地跳出内层循环
                         break
 
                 if not batch_indices:
-                    finished = True  # 如果一个 batch 都没取到，说明 sampler_a 彻底空了
+                    finished = True
                     break
                 yield from batch_indices
 
             if finished:
                 break
 
-            # 从 sampler_b 中读取 n 个 batch 的索引
             for _ in range(self.n):
                 batch_indices = []
                 for _ in range(self.batch_size):
                     try:
-                        # 关键：为 b 的索引加上 a 的总长度偏移
                         idx = next(iter_b) + self.total_len_a
                         batch_indices.append(idx)
                     except StopIteration:

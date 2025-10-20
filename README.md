@@ -42,14 +42,11 @@ We evaluate the effect of DualOptim in the following MU tasks:
 If you use this work, please cite:
 
 ```bibtex
-@misc{zhong2025dualoptimenhancingefficacystability,
-      title={DualOptim: Enhancing Efficacy and Stability in Machine Unlearning with Dual Optimizers}, 
-      author={Xuyang Zhong and Haochen Luo and Chen Liu},
-      year={2025},
-      eprint={2504.15827},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG},
-      url={https://arxiv.org/abs/2504.15827}, 
+@article{zhong2025dualoptim,
+  title={DualOptim: Enhancing Efficacy and Stability in Machine Unlearning with Dual Optimizers},
+  author={Xuyang Zhong and Haochen Luo and Chen Liu},
+  journal={Advances in Neural Information Processing Systems},
+  year={2025}
 }
 ```
 

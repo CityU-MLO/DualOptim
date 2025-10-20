@@ -33,7 +33,6 @@ class Optimizer2StateDecouple(bnb.optim.optimizer.Optimizer8bit):
         lr_ratio_2=1.0,
         switch_freq_1=1,
         switch_freq_2=1,
-        reinit_step=None,
         alpha=0.0,
         t_alpha: Optional[int] = None,
         t_beta3: Optional[int] = None,
@@ -170,7 +169,6 @@ class Optimizer2StateDecouple(bnb.optim.optimizer.Optimizer8bit):
             args["decouple_v"] = decouple_v
             args["switch_freq_1"] = switch_freq_1
             args["switch_freq_2"] = switch_freq_2
-            args["reinit_step"] = reinit_step
             self.args = MockArgs(args)
         else:
             self.args = args
@@ -211,7 +209,6 @@ class Optimizer2StateDecouple(bnb.optim.optimizer.Optimizer8bit):
         config["decouple_v"] = self.args.decouple_v
         config["switch_freq_1"] = self.args.switch_freq_1
         config["switch_freq_2"] = self.args.switch_freq_2
-        config["reinit_step"] = self.args.reinit_step
 
         if (gindex, pindex) in self.mng.index2config:
             config.update(self.mng.index2config[(gindex, pindex)])
@@ -403,10 +400,6 @@ class Optimizer2StateDecouple(bnb.optim.optimizer.Optimizer8bit):
             if mode == 1
             else state["state1_2"].dtype
         )
-
-        # reinitialize state
-        # if config["reinit_step"] is not None and state["step"] == config["reinit_step"]:
-        #     self.init_state(group, p, gindex, pindex)
 
         state["step"] += 1
         if is_dual:
@@ -648,7 +641,6 @@ class AdamWDecoupleNormal(Optimizer2StateDecouple):
         lr_ratio_2=1.0,
         switch_freq_1=1,
         switch_freq_2=1,
-        reinit_step=None,
     ):
         """
         8-bit AdamWDecouple optimizer.
@@ -698,7 +690,6 @@ class AdamWDecoupleNormal(Optimizer2StateDecouple):
             lr_ratio_2=lr_ratio_2,
             switch_freq_1=switch_freq_1,
             switch_freq_2=switch_freq_2,
-            reinit_step=reinit_step,
         )
 
 
@@ -721,7 +712,6 @@ class AdamWDecouple8bit(Optimizer2StateDecouple):
         lr_ratio_2=1.0,
         switch_freq_1=1,
         switch_freq_2=1,
-        reinit_step=None,
     ):
         """
         8-bit AdamWDecouple optimizer.
@@ -771,5 +761,4 @@ class AdamWDecouple8bit(Optimizer2StateDecouple):
             lr_ratio_2=lr_ratio_2,
             switch_freq_1=switch_freq_1,
             switch_freq_2=switch_freq_2,
-            reinit_step=reinit_step,
         )
