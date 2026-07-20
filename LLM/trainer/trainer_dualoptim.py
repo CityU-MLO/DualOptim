@@ -92,8 +92,8 @@ class CustomTrainerForgettingAlternate(Trainer):
             dataset_a=dataset_a,
             dataset_b=dataset_b,
             batch_size=self.args.train_batch_size,
-            m=self.forget_freq * self.args.gradient_accumulation_steps,
-            n=self.retain_freq * self.args.gradient_accumulation_steps,
+            m=self.forget_freq * self.args.gradient_accumulation_steps * self.args.world_size,
+            n=self.retain_freq * self.args.gradient_accumulation_steps * self.args.world_size,
         )
 
     def create_optimizer_and_scheduler(self, num_training_steps: int):
