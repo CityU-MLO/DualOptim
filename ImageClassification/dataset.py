@@ -75,6 +75,7 @@ def svhn_dataloaders(
     num_indexes_to_replace=None,
     indexes_to_replace=None,
     seed: int = 1,
+    val_split_seed: int=1,
     only_mark: bool = False,
     shuffle=True,
     no_aug=False,
@@ -94,7 +95,7 @@ def svhn_dataloaders(
     train_set.labels = np.array(train_set.labels)
     test_set.labels = np.array(test_set.labels)
 
-    rng = np.random.RandomState(seed)
+    rng = np.random.RandomState(val_split_seed)
     valid_set = copy.deepcopy(train_set)
     valid_idx = []
     for i in range(max(train_set.labels) + 1):
@@ -175,6 +176,7 @@ def cifar100_dataloaders(
     num_indexes_to_replace=None,
     indexes_to_replace=None,
     seed: int = 1,
+    val_split_seed: int=1,
     only_mark: bool = False,
     shuffle=True,
     no_aug=False,
@@ -203,7 +205,7 @@ def cifar100_dataloaders(
     train_set.targets = np.array(train_set.targets)
     test_set.targets = np.array(test_set.targets)
 
-    rng = np.random.RandomState(seed)
+    rng = np.random.RandomState(val_split_seed)
     valid_set = copy.deepcopy(train_set)
     valid_idx = []
     for i in range(max(train_set.targets) + 1):
@@ -429,6 +431,7 @@ class TinyImageNet:
         num_indexes_to_replace=None,
         indexes_to_replace=None,
         seed: int = 1,
+        val_split_seed: int=1,
         only_mark: bool = False,
         shuffle=True,
         no_aug=False,
@@ -439,7 +442,7 @@ class TinyImageNet:
         test_set = TinyImageNetDataset(test_set, self.norm_layer)
         train_set.targets = np.array(train_set.targets)
         train_set.targets = np.array(train_set.targets)
-        rng = np.random.RandomState(seed)
+        rng = np.random.RandomState(val_split_seed)
         valid_set = copy.deepcopy(train_set)
         valid_idx = []
         for i in range(max(train_set.targets) + 1):
@@ -526,6 +529,7 @@ def cifar10_dataloaders(
     num_indexes_to_replace=None,
     indexes_to_replace=None,
     seed: int = 1,
+    val_split_seed: int=1,
     only_mark: bool = False,
     shuffle=True,
     no_aug=False,
@@ -556,7 +560,7 @@ def cifar10_dataloaders(
     train_set.targets = np.array(train_set.targets)
     test_set.targets = np.array(test_set.targets)
 
-    rng = np.random.RandomState(seed)
+    rng = np.random.RandomState(val_split_seed)
     valid_set = copy.deepcopy(train_set)
     valid_idx = []
     for i in range(max(train_set.targets) + 1):
